@@ -7,6 +7,7 @@ use App\Controller\HomeController;
 use App\Controller\PostController;
 use App\Core\Config;
 use App\Core\Database;
+use App\Core\ErrorPage;
 use App\Core\NotFoundException;
 use App\Core\Request;
 use App\Core\Router;
@@ -25,6 +26,8 @@ $view = new View(
     $root . '/var/smarty/compile',
     $root . '/var/smarty/cache',
 );
+
+$errorPage = new ErrorPage($view);
 
 $seo = new Seo($config->get('APP_URL', 'http://localhost:8080'));
 
@@ -66,7 +69,7 @@ try {
     echo $controller->$method($request, ...array_values($match['params']));
 } catch (NotFoundException) {
     http_response_code(404);
-    echo $view->render('404.tpl', ['title' => 'Страница не найдена']);
+    echo $errorPage->render('404.tpl', 'Страница не найдена');
 } catch (Throwable $error) {
     http_response_code(500);
     error_log((string) $error);
@@ -74,6 +77,6 @@ try {
     if ($config->bool('APP_DEBUG')) {
         echo '<pre>' . htmlspecialchars((string) $error, ENT_QUOTES) . '</pre>';
     } else {
-        echo 'Внутренняя ошибка сервера.';
+        echo $errorPage->render('500.tpl', 'Ошибка сервера');
     }
 }
