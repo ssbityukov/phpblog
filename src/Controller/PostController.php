@@ -6,6 +6,7 @@ namespace App\Controller;
 
 use App\Core\NotFoundException;
 use App\Core\Request;
+use App\Core\Seo;
 use App\Core\View;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
@@ -18,6 +19,7 @@ final class PostController
         private readonly CategoryRepository $categories,
         private readonly PostRepository $posts,
         private readonly View $view,
+        private readonly Seo $seo,
     ) {
     }
 
@@ -36,6 +38,8 @@ final class PostController
 
         return $this->view->render('post.tpl', [
             'title' => $post->title,
+            'description' => $this->seo->description($post->description),
+            'canonical' => $this->seo->canonical('/post/' . $post->slug),
             'post' => $post,
             'views' => $post->views + 1,
             'categories' => $categories,

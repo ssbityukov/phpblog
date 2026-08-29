@@ -10,6 +10,7 @@ use App\Core\Database;
 use App\Core\NotFoundException;
 use App\Core\Request;
 use App\Core\Router;
+use App\Core\Seo;
 use App\Core\View;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
@@ -24,6 +25,8 @@ $view = new View(
     $root . '/var/smarty/compile',
     $root . '/var/smarty/cache',
 );
+
+$seo = new Seo($config->get('APP_URL', 'http://localhost:8080'));
 
 $router = new Router();
 $router->add('/', [HomeController::class, 'index']);
@@ -43,16 +46,19 @@ try {
             new CategoryRepository($pdo),
             new PostRepository($pdo),
             $view,
+            $seo,
         ),
         CategoryController::class => new CategoryController(
             new CategoryRepository($pdo),
             new PostRepository($pdo),
             $view,
+            $seo,
         ),
         PostController::class => new PostController(
             new CategoryRepository($pdo),
             new PostRepository($pdo),
             $view,
+            $seo,
         ),
         default => throw new LogicException(sprintf('No wiring for controller "%s".', $class)),
     };
@@ -60,7 +66,7 @@ try {
     echo $controller->$method($request, ...array_values($match['params']));
 } catch (NotFoundException) {
     http_response_code(404);
-    echo $view->render('404.tpl');
+    echo $view->render('404.tpl', ['title' => 'Страница не найдена']);
 } catch (Throwable $error) {
     http_response_code(500);
     error_log((string) $error);

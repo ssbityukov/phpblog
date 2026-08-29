@@ -7,6 +7,7 @@ namespace App\Controller;
 use App\Core\NotFoundException;
 use App\Core\Paginator;
 use App\Core\Request;
+use App\Core\Seo;
 use App\Core\View;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
@@ -19,6 +20,7 @@ final class CategoryController
         private readonly CategoryRepository $categories,
         private readonly PostRepository $posts,
         private readonly View $view,
+        private readonly Seo $seo,
     ) {
     }
 
@@ -44,6 +46,8 @@ final class CategoryController
 
         return $this->view->render('category.tpl', [
             'title' => $category->name,
+            'description' => $this->seo->description($category->description),
+            'canonical' => $this->seo->canonical('/category/' . $category->slug, $paginator->page()),
             'category' => $category,
             'sort' => $sort,
             'paginator' => $paginator,
