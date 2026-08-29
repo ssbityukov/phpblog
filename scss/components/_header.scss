@@ -1,0 +1,21 @@
+@use '../variables' as v;
+
+.header {
+    background: v.$color-background;
+    border-bottom: 1px solid v.$color-border;
+    padding: v.$space-3 0;
+    margin-bottom: v.$space-5;
+
+    &__logo {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: v.$color-text;
+    }
+}
+
+.footer {
+    margin-top: v.$space-5;
+    padding: v.$space-4 0;
+    border-top: 1px solid v.$color-border;
+    color: v.$color-muted;
+}

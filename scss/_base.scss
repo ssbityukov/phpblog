@@ -1,0 +1,78 @@
+@use 'variables' as v;
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    color: v.$color-text;
+    background: v.$color-surface;
+}
+
+a {
+    color: v.$color-accent;
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.container {
+    width: 100%;
+    max-width: v.$container-width;
+    margin: 0 auto;
+    padding: 0 v.$space-3;
+}
+
+.page-title {
+    margin-bottom: v.$space-2;
+}
+
+.page-description {
+    color: v.$color-muted;
+    margin-top: 0;
+}
+
+.button {
+    display: inline-block;
+    padding: v.$space-2 v.$space-3;
+    border-radius: v.$radius;
+    background: v.$color-accent;
+    color: #fff;
+
+    &:hover {
+        text-decoration: none;
+        opacity: 0.9;
+    }
+}
+
+.tag {
+    display: inline-block;
+    padding: v.$space-1 v.$space-2;
+    margin-right: v.$space-1;
+    border-radius: v.$radius;
+    background: v.$color-surface;
+    font-size: 0.875rem;
+}
+
+.sort {
+    margin-bottom: v.$space-4;
+
+    &__label {
+        color: v.$color-muted;
+        margin-right: v.$space-2;
+    }
+
+    &__link {
+        margin-right: v.$space-2;
+
+        &--active {
+            font-weight: 600;
+            color: v.$color-text;
+        }
+    }
+}

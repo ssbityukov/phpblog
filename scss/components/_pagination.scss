@@ -1,0 +1,20 @@
+@use '../variables' as v;
+@use '../mixins' as m;
+
+.pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: v.$space-2;
+    margin-top: v.$space-4;
+
+    &__link {
+        @include m.card-surface;
+        padding: v.$space-2 v.$space-3;
+
+        &--current {
+            background: v.$color-accent;
+            border-color: v.$color-accent;
+            color: #fff;
+        }
+    }
+}

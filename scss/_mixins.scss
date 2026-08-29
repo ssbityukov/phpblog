@@ -1,0 +1,13 @@
+@use 'variables' as v;
+
+@mixin media-up($breakpoint) {
+    @media (min-width: $breakpoint) {
+        @content;
+    }
+}
+
+@mixin card-surface {
+    background: v.$color-background;
+    border: 1px solid v.$color-border;
+    border-radius: v.$radius;
+}
