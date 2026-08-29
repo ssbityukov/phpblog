@@ -14,7 +14,7 @@ $root = dirname(__DIR__);
 $command = $argv[1] ?? '';
 
 try {
-    $config = Config::fromFile($root . '/.env');
+    $config = Config::load($root . '/.env');
     $database = new Database($config);
     $migrator = new Migrator($database->pdo(), $root . '/database/migrations');
 

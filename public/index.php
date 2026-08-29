@@ -18,7 +18,7 @@ use App\Repository\PostRepository;
 require dirname(__DIR__) . '/vendor/autoload.php';
 
 $root = dirname(__DIR__);
-$config = Config::fromFile($root . '/.env');
+$config = Config::load($root . '/.env');
 $database = new Database($config);
 $view = new View(
     $root . '/templates',
@@ -71,7 +71,7 @@ try {
     http_response_code(500);
     error_log((string) $error);
 
-    if ($config->get('APP_DEBUG') === '1') {
+    if ($config->bool('APP_DEBUG')) {
         echo '<pre>' . htmlspecialchars((string) $error, ENT_QUOTES) . '</pre>';
     } else {
         echo 'Внутренняя ошибка сервера.';

@@ -12,10 +12,9 @@
         </testsuite>
     </testsuites>
     <php>
-        <env force="true" name="DB_HOST" value="mysql"/>
-        <env force="true" name="DB_PORT" value="3306"/>
+        <env name="DB_HOST" value="127.0.0.1"/>
+        <env name="DB_PORT" value="3306"/>
+        <env name="DB_USERNAME" value="blog"/>
         <env force="true" name="DB_DATABASE" value="blog_test"/>
-        <env force="true" name="DB_USERNAME" value="root"/>
-        <env force="true" name="DB_PASSWORD" value="secret"/>
     </php>
 </phpunit>
