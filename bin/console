@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use App\Core\Config;
+use App\Core\Database;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$root = dirname(__DIR__);
+$config = Config::fromFile($root . '/.env');
+$database = new Database($config);
+
+$command = $argv[1] ?? '';
+
+switch ($command) {
+    case 'migrate':
+        $sql = file_get_contents($root . '/database/schema.sql');
+        $database->pdo()->exec($sql);
+        echo "Schema applied.\n";
+        break;
+
+    default:
+        echo "Usage: php bin/console migrate\n";
+        exit(1);
+}
