@@ -1,0 +1,13 @@
+/vendor/
+/node_modules/
+/var/smarty/compile/*
+/var/smarty/cache/*
+!/var/smarty/compile/.gitkeep
+!/var/smarty/cache/.gitkeep
+/public/assets/css/app.css
+/public/uploads/posts/*
+!/public/uploads/posts/.gitkeep
+.env
+.phpunit.result.cache
+/.phpunit.cache/
+/.idea/
