@@ -49,8 +49,9 @@ final class CategoryTemplateTest extends TemplateTestCase
     {
         $html = $this->render(sort: 'views', paginator: new Paginator(30, 10, 2));
 
-        self::assertStringContainsString('href="/category/php?sort=views&page=1">Назад</a>', $html);
-        self::assertStringContainsString('href="/category/php?sort=views&page=3">Вперёд</a>', $html);
+        self::assertStringContainsString('href="/category/php?sort=views&amp;page=1">Назад</a>', $html);
+        self::assertStringContainsString('href="/category/php?sort=views&amp;page=3">Вперёд</a>', $html);
+        self::assertStringNotContainsString('page=', str_replace('&amp;page=', '', $html), 'Амперсанд в href должен быть &amp;.');
         self::assertStringContainsString('pagination__link--current">2</span>', $html);
     }
 
