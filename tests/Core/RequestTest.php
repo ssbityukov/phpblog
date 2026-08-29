@@ -77,4 +77,39 @@ final class RequestTest extends TestCase
         self::assertSame('', $request->query('page'));
         self::assertSame('views', $request->query('sort'));
     }
+
+    public function testDefaultsToGetMethod(): void
+    {
+        self::assertSame('GET', (new Request('/', []))->method());
+    }
+
+    public function testReturnsGivenMethod(): void
+    {
+        self::assertSame('HEAD', (new Request('/', [], 'HEAD'))->method());
+    }
+
+    public function testNormalisesMethodToUpperCase(): void
+    {
+        self::assertSame('HEAD', (new Request('/', [], 'head'))->method());
+    }
+
+    #[BackupGlobals(true)]
+    public function testReadsMethodFromGlobals(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/post/hello';
+        $_SERVER['REQUEST_METHOD'] = 'HEAD';
+        $_GET = [];
+
+        self::assertSame('HEAD', Request::fromGlobals()->method());
+    }
+
+    #[BackupGlobals(true)]
+    public function testFallsBackToGetWhenMethodMissing(): void
+    {
+        $_SERVER['REQUEST_URI'] = '/post/hello';
+        unset($_SERVER['REQUEST_METHOD']);
+        $_GET = [];
+
+        self::assertSame('GET', Request::fromGlobals()->method());
+    }
 }

@@ -34,7 +34,9 @@ final class PostController
         $categories = $this->categories->findByPostId($post->id);
         $categoryIds = array_map(static fn ($category) => $category->id, $categories);
 
-        $this->posts->incrementViews($post->id);
+        if ($request->method() !== 'HEAD') {
+            $this->posts->incrementViews($post->id);
+        }
 
         return $this->view->render('post.tpl', [
             'title' => $post->title,

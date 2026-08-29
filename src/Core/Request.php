@@ -10,6 +10,7 @@ final class Request
     public function __construct(
         private readonly string $uri,
         private readonly array $query,
+        private readonly string $method = 'GET',
     ) {
     }
 
@@ -24,8 +25,18 @@ final class Request
         }
 
         $uri = $_SERVER['REQUEST_URI'] ?? '/';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
-        return new self(is_string($uri) ? $uri : '/', $query);
+        return new self(
+            is_string($uri) ? $uri : '/',
+            $query,
+            is_string($method) ? $method : 'GET',
+        );
+    }
+
+    public function method(): string
+    {
+        return strtoupper($this->method);
     }
 
     public function path(): string
