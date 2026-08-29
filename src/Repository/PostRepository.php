@@ -50,6 +50,61 @@ final class PostRepository
         return array_map(Post::fromRow(...), $statement->fetchAll());
     }
 
+    public function findBySlug(string $slug): ?Post
+    {
+        $statement = $this->pdo->prepare('SELECT * FROM posts WHERE slug = :slug');
+        $statement->execute(['slug' => $slug]);
+        $row = $statement->fetch();
+
+        return $row === false ? null : Post::fromRow($row);
+    }
+
+    public function incrementViews(int $postId): void
+    {
+        $statement = $this->pdo->prepare('UPDATE posts SET views = views + 1 WHERE id = :id');
+        $statement->execute(['id' => $postId]);
+    }
+
+    /**
+     * @param list<int> $categoryIds
+     * @return list<Post>
+     */
+    public function findSimilar(int $postId, array $categoryIds, int $limit = 3): array
+    {
+        if ($categoryIds === []) {
+            return [];
+        }
+
+        $placeholders = [];
+        $parameters = [];
+
+        foreach (array_values($categoryIds) as $index => $categoryId) {
+            $placeholders[] = ':category_' . $index;
+            $parameters['category_' . $index] = $categoryId;
+        }
+
+        $statement = $this->pdo->prepare(
+            'SELECT p.*, COUNT(*) AS shared
+             FROM posts p
+             JOIN post_category pc ON pc.post_id = p.id
+             WHERE pc.category_id IN (' . implode(', ', $placeholders) . ')
+               AND p.id <> :post_id
+             GROUP BY p.id
+             ORDER BY shared DESC, p.published_at DESC, p.id DESC
+             LIMIT :limit'
+        );
+
+        foreach ($parameters as $name => $value) {
+            $statement->bindValue($name, $value, PDO::PARAM_INT);
+        }
+
+        $statement->bindValue('post_id', $postId, PDO::PARAM_INT);
+        $statement->bindValue('limit', $limit, PDO::PARAM_INT);
+        $statement->execute();
+
+        return array_map(Post::fromRow(...), $statement->fetchAll());
+    }
+
     /** @return array<int, list<Post>> */
     public function latestByCategories(int $limit = 3): array
     {
