@@ -5,23 +5,34 @@ declare(strict_types=1);
 
 use App\Core\Config;
 use App\Core\Database;
+use App\Database\Seeder;
 
 require __DIR__ . '/../vendor/autoload.php';
 
 $root = dirname(__DIR__);
-$config = Config::fromFile($root . '/.env');
-$database = new Database($config);
-
 $command = $argv[1] ?? '';
 
-switch ($command) {
-    case 'migrate':
-        $sql = file_get_contents($root . '/database/schema.sql');
-        $database->pdo()->exec($sql);
-        echo "Schema applied.\n";
-        break;
+try {
+    $config = Config::fromFile($root . '/.env');
+    $database = new Database($config);
 
-    default:
-        echo "Usage: php bin/console migrate\n";
-        exit(1);
+    switch ($command) {
+        case 'migrate':
+            $database->pdo()->exec((string) file_get_contents($root . '/database/schema.sql'));
+            echo "Schema applied.\n";
+            break;
+
+        case 'seed':
+            $seeder = new Seeder($database->pdo(), $root . '/public/uploads/posts');
+            $seeder->run(in_array('--fresh', $argv, true));
+            echo "Seed completed.\n";
+            break;
+
+        default:
+            fwrite(STDERR, "Usage: php bin/console migrate | seed [--fresh]\n");
+            exit(1);
+    }
+} catch (Throwable $error) {
+    fwrite(STDERR, 'Error: ' . $error->getMessage() . "\n");
+    exit(1);
 }
