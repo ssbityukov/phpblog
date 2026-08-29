@@ -5,6 +5,7 @@ declare(strict_types=1);
 
 use App\Core\Config;
 use App\Core\Database;
+use App\Database\Migrator;
 use App\Database\Seeder;
 
 require __DIR__ . '/../vendor/autoload.php';
@@ -15,11 +16,31 @@ $command = $argv[1] ?? '';
 try {
     $config = Config::fromFile($root . '/.env');
     $database = new Database($config);
+    $migrator = new Migrator($database->pdo(), $root . '/database/migrations');
 
     switch ($command) {
         case 'migrate':
-            $database->pdo()->exec((string) file_get_contents($root . '/database/schema.sql'));
-            echo "Schema applied.\n";
+            $applied = $migrator->migrate();
+            echo $applied === []
+                ? "Nothing to migrate.\n"
+                : sprintf("Applied %d migration(s):\n  %s\n", count($applied), implode("\n  ", $applied));
+            break;
+
+        case 'migrate:fresh':
+            $applied = $migrator->fresh();
+            echo sprintf("Dropped everything and applied %d migration(s).\n", count($applied));
+            break;
+
+        case 'migrate:status':
+            foreach ($migrator->status() as $row) {
+                $state = match (true) {
+                    $row['missing'] => 'missing file',
+                    $row['applied_at'] !== null => 'applied ' . $row['applied_at'],
+                    default => 'pending',
+                };
+
+                echo sprintf("  %-32s %s\n", $row['migration'], $state);
+            }
             break;
 
         case 'seed':
@@ -29,7 +50,7 @@ try {
             break;
 
         default:
-            fwrite(STDERR, "Usage: php bin/console migrate | seed [--fresh]\n");
+            fwrite(STDERR, "Usage: php bin/console migrate | migrate:fresh | migrate:status | seed [--fresh]\n");
             exit(1);
     }
 } catch (Throwable $error) {

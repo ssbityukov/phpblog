@@ -6,7 +6,7 @@ namespace App\Core;
 
 use Smarty\Smarty;
 
-final class View
+final class View implements ViewInterface
 {
     private readonly Smarty $smarty;
 

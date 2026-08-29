@@ -8,7 +8,7 @@ use App\Core\NotFoundException;
 use App\Core\Paginator;
 use App\Core\Request;
 use App\Core\Seo;
-use App\Core\View;
+use App\Core\ViewInterface;
 use App\Repository\CategoryRepository;
 use App\Repository\PostRepository;
 
@@ -19,7 +19,7 @@ final class CategoryController
     public function __construct(
         private readonly CategoryRepository $categories,
         private readonly PostRepository $posts,
-        private readonly View $view,
+        private readonly ViewInterface $view,
         private readonly Seo $seo,
     ) {
     }
