@@ -27,8 +27,15 @@ try {
             break;
 
         case 'migrate:fresh':
+            $name = (string) $config->get('DB_DATABASE', 'blog');
+
+            if (!in_array('--force', $argv, true) && !confirmDatabaseWipe($name)) {
+                echo "Aborted.\n";
+                exit(1);
+            }
+
             $applied = $migrator->fresh();
-            echo sprintf("Dropped everything and applied %d migration(s).\n", count($applied));
+            echo sprintf("Dropped every table in \"%s\" and applied %d migration(s).\n", $name, count($applied));
             break;
 
         case 'migrate:status':
@@ -50,10 +57,24 @@ try {
             break;
 
         default:
-            fwrite(STDERR, "Usage: php bin/console migrate | migrate:fresh | migrate:status | seed [--fresh]\n");
+            fwrite(STDERR, "Usage: php bin/console migrate | migrate:fresh [--force] | migrate:status | seed [--fresh]\n");
             exit(1);
     }
 } catch (Throwable $error) {
     fwrite(STDERR, 'Error: ' . $error->getMessage() . "\n");
     exit(1);
+}
+
+/** Просит подтвердить снос базы, набрав её имя. Без TTY отказывает. */
+function confirmDatabaseWipe(string $database): bool
+{
+    if (!stream_isatty(STDIN)) {
+        fwrite(STDERR, "migrate:fresh drops every table. Re-run with --force in a non-interactive shell.\n");
+
+        return false;
+    }
+
+    printf('Это сотрёт ВСЕ таблицы базы "%s" без возможности отката. Введите имя базы для подтверждения: ', $database);
+
+    return trim((string) fgets(STDIN)) === $database;
 }
