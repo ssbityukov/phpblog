@@ -45,11 +45,12 @@ services:
 
   node:
     image: node:22-alpine
-    profiles: ["assets"]
     working_dir: /app
     volumes:
       - .:/app
-    command: sh -c "npm install && npm run build"
+    # Собирает CSS на чистом клоне (app.css не трекается) и выходит.
+    # Готовый файл не пересобирает: для этого есть `npm run build`.
+    command: sh -c "[ -f public/assets/css/app.css ] || (npm install && npm run build)"
 
 volumes:
   mysql-data:
