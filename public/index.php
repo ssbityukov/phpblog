@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
+use App\Controller\HomeController;
 use App\Core\Config;
 use App\Core\Database;
 use App\Core\NotFoundException;
 use App\Core\Request;
 use App\Core\Router;
 use App\Core\View;
+use App\Repository\CategoryRepository;
+use App\Repository\PostRepository;
 
 require dirname(__DIR__) . '/vendor/autoload.php';
 
@@ -21,7 +24,7 @@ $view = new View(
 );
 
 $router = new Router();
-$router->add('/', [App\Controller\HomeController::class, 'index']);
+$router->add('/', [HomeController::class, 'index']);
 
 $request = Request::fromGlobals();
 
@@ -29,7 +32,17 @@ try {
     $match = $router->match($request->path());
     [$class, $method] = $match['handler'];
 
-    $controller = new $class($database->pdo(), $view);
+    $pdo = $database->pdo();
+
+    $controller = match ($class) {
+        HomeController::class => new HomeController(
+            new CategoryRepository($pdo),
+            new PostRepository($pdo),
+            $view,
+        ),
+        default => throw new LogicException(sprintf('No wiring for controller "%s".', $class)),
+    };
+
     echo $controller->$method($request, ...array_values($match['params']));
 } catch (NotFoundException) {
     http_response_code(404);
