@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Controller\CategoryController;
 use App\Controller\HomeController;
 use App\Core\Config;
 use App\Core\Database;
@@ -25,6 +26,7 @@ $view = new View(
 
 $router = new Router();
 $router->add('/', [HomeController::class, 'index']);
+$router->add('/category/{slug}', [CategoryController::class, 'show']);
 
 $request = Request::fromGlobals();
 
@@ -36,6 +38,11 @@ try {
 
     $controller = match ($class) {
         HomeController::class => new HomeController(
+            new CategoryRepository($pdo),
+            new PostRepository($pdo),
+            $view,
+        ),
+        CategoryController::class => new CategoryController(
             new CategoryRepository($pdo),
             new PostRepository($pdo),
             $view,
