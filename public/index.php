@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Controller\CategoryController;
 use App\Controller\HomeController;
+use App\Controller\PostController;
 use App\Core\Config;
 use App\Core\Database;
 use App\Core\NotFoundException;
@@ -27,6 +28,7 @@ $view = new View(
 $router = new Router();
 $router->add('/', [HomeController::class, 'index']);
 $router->add('/category/{slug}', [CategoryController::class, 'show']);
+$router->add('/post/{slug}', [PostController::class, 'show']);
 
 $request = Request::fromGlobals();
 
@@ -43,6 +45,11 @@ try {
             $view,
         ),
         CategoryController::class => new CategoryController(
+            new CategoryRepository($pdo),
+            new PostRepository($pdo),
+            $view,
+        ),
+        PostController::class => new PostController(
             new CategoryRepository($pdo),
             new PostRepository($pdo),
             $view,

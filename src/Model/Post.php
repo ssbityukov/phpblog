@@ -33,6 +33,11 @@ final class Post
         );
     }
 
+    public function bodyHtml(): string
+    {
+        return nl2br(htmlspecialchars($this->body, ENT_QUOTES, 'UTF-8'));
+    }
+
     public function publishedDate(): string
     {
         return (new \DateTimeImmutable($this->publishedAt))->format('d.m.Y');
